@@ -5,8 +5,8 @@ export = messages;
 
 module messages {
     export interface AddressableMessage {
-        from : string;
-        to: string;
+        from : number;
+        to: number;
     }
     export interface BinaryMessage  extends AddressableMessage {
         data: Buffer;
