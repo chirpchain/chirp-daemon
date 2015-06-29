@@ -5,9 +5,11 @@ export = SocketApp;
 
 import messages = require("./messages");
 import BiMap = require("bimap");
+import events = require("./events");
 
 class SocketApp {
     static MAX_ASSIGN_ID = 64;
+
 
     map = new BiMap<number,string>();
     lastId = 0;
@@ -15,37 +17,37 @@ class SocketApp {
         io.on("connection", (socket : SocketIO.Socket) => {
             console.log("Someone connected");
 
-            socket.on("audioData", (msg : messages.AudioMessage) => {
-                this.route("audioData", msg);
+            socket.on(events.AUDIO_DATA, (msg : messages.AudioMessage) => {
+                this.route(events.AUDIO_DATA, msg);
             });
-            socket.on("byteData", (msg : messages.AudioMessage) => {
-                this.route("byteData", msg);
+            socket.on(events.BYTE_DATA, (msg : messages.AudioMessage) => {
+                this.route(events.BYTE_DATA, msg);
             });
-            socket.on("chirpData", (msg : messages.ChirpMessage) => {
+            socket.on(events.CHIRP_DATA, (msg : messages.ChirpMessage) => {
                 this.noticeChirpMessage(msg);
-                this.route("chirpData", msg);
+                this.route(events.CHIRP_DATA, msg);
             });
-            socket.on("assignMeAnId", () => {
+            socket.on(events.ASSIGN_ID_REQUEST, () => {
                 if (this.lastId == SocketApp.MAX_ASSIGN_ID) this.lastId = 0;
                 var newId = this.lastId++;
                 this.assignId(socket, newId);
             });
-            socket.on("login", (id : number) => {
+            socket.on(events.LOGIN_REQUEST, (id : number) => {
                 console.log("Client id " + id + " logged in");
                 if (id < SocketApp.MAX_ASSIGN_ID) {
                     var message = "Client tried to log in with id " + id + " which is below the allowed value!";
                     console.warn();
-                    socket.emit("clientError", message);
+                    socket.emit(events.CLIENT_ERROR_RESPONSE, message);
                 }
                 this.assignId(socket, id);
             });
-            socket.on("listPeers", () => {
+            socket.on(events.LIST_PEERS, () => {
                 var keys = new Array<number>();
                 for(var key in this.map.kv) {
                     if (! this.map.kv.hasOwnProperty(key)) continue;
                     keys.push(key);
                 }
-                socket.emit("listPeers", keys);
+                socket.emit(events.LIST_PEERS, keys);
             });
         });
         io.on("disconnect", (socket : SocketIO.Socket) => {
@@ -76,13 +78,13 @@ class SocketApp {
         var socketId : string = this.map.key(clientId);
         console.log("Client with id " + clientId + " and socket id " + socketId + " disconnected");
         this.map.removeKey(clientId);
-        this.io.sockets.emit("peerDisconnected", clientId);
+        this.io.sockets.emit(events.PEER_DISCONNECTED_RESPONSE, clientId);
     }
 
     assignId(socket : SocketIO.Socket, id : number) {
         console.log("Assigning an client id of " + id);
         this.map.push(id, socket.id);
-        socket.emit("setClientId", id);
-        socket.broadcast.emit("newPeer", id);
+        socket.emit(events.ASSIGN_ID_RESPONSE, id);
+        socket.broadcast.emit(events.NEW_PEER_RESPONSE, id);
     }
 }
