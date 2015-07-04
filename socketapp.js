@@ -10,6 +10,28 @@ var SocketApp = (function () {
         this.lastId = 0;
         io.on("connection", function (socket) {
             console.log("Someone connected");
+            var doPing = function () {
+                var responded = false;
+                socket.emit("ping", function () {
+                    responded = true;
+                });
+                setTimeout(function () {
+                    if (!responded) {
+                        console.log("Ping timed out");
+                        socket.disconnect(false);
+                    }
+                    else {
+                        doPing();
+                    }
+                }, SocketApp.PING_INTERVAL);
+            };
+            doPing();
+            var peerId = -1;
+            socket.on("disconnect", function () {
+                if (_this.map.key(peerId) === socket.id) {
+                    _this.clientGone(peerId);
+                }
+            });
             socket.on(events.AUDIO_DATA, function (msg) {
                 _this.route(events.AUDIO_DATA, msg);
             });
@@ -24,6 +46,7 @@ var SocketApp = (function () {
                 if (_this.lastId == SocketApp.MAX_ASSIGN_ID)
                     _this.lastId = 0;
                 var newId = _this.lastId++;
+                peerId = newId;
                 _this.assignId(socket, newId);
             });
             socket.on(events.LOGIN_REQUEST, function (id) {
@@ -33,6 +56,7 @@ var SocketApp = (function () {
                     console.warn();
                     socket.emit(events.CLIENT_ERROR_RESPONSE, message);
                 }
+                peerId = id;
                 _this.assignId(socket, id);
             });
             socket.on(events.LIST_PEERS, function () {
@@ -79,6 +103,7 @@ var SocketApp = (function () {
         socket.broadcast.emit(events.NEW_PEER_RESPONSE, id);
     };
     SocketApp.MAX_ASSIGN_ID = 64;
+    SocketApp.PING_INTERVAL = 30000;
     return SocketApp;
 })();
 module.exports = SocketApp;

@@ -9,6 +9,7 @@ import events = require("./events");
 
 class SocketApp {
     static MAX_ASSIGN_ID = 64;
+    static PING_INTERVAL = 30000;
 
 
     map = new BiMap<number,string>();
@@ -16,7 +17,28 @@ class SocketApp {
     constructor(private io : SocketIO.Server) {
         io.on("connection", (socket : SocketIO.Socket) => {
             console.log("Someone connected");
-
+            var doPing = () => {
+                var responded = false;
+                socket.emit("ping", () => {
+                    responded = true;
+                });
+                setTimeout(() => {
+                    if (!responded) {
+                        console.log("Ping timed out");
+                        socket.disconnect(false);
+                    }
+                    else {
+                        doPing();
+                    }
+                }, SocketApp.PING_INTERVAL);
+            };
+            doPing();
+            var peerId = -1;
+            socket.on("disconnect", () => {
+                if (this.map.key(peerId) === socket.id) {
+                    this.clientGone(peerId);
+                }
+            });
             socket.on(events.AUDIO_DATA, (msg : messages.AudioMessage) => {
                 this.route(events.AUDIO_DATA, msg);
             });
@@ -30,6 +52,7 @@ class SocketApp {
             socket.on(events.ASSIGN_ID_REQUEST, () => {
                 if (this.lastId == SocketApp.MAX_ASSIGN_ID) this.lastId = 0;
                 var newId = this.lastId++;
+                peerId = newId;
                 this.assignId(socket, newId);
             });
             socket.on(events.LOGIN_REQUEST, (id : number) => {
@@ -39,6 +62,7 @@ class SocketApp {
                     console.warn();
                     socket.emit(events.CLIENT_ERROR_RESPONSE, message);
                 }
+                peerId = id;
                 this.assignId(socket, id);
             });
             socket.on(events.LIST_PEERS, () => {
