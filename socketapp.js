@@ -53,7 +53,7 @@ var SocketApp = (function () {
                 console.log("Client id " + id + " logged in");
                 if (id < SocketApp.MAX_ASSIGN_ID) {
                     var message = "Client tried to log in with id " + id + " which is below the allowed value!";
-                    console.warn();
+                    console.warn(message);
                     socket.emit(events.CLIENT_ERROR_RESPONSE, message);
                 }
                 peerId = id;
@@ -102,7 +102,7 @@ var SocketApp = (function () {
         socket.emit(events.ASSIGN_ID_RESPONSE, id);
         socket.broadcast.emit(events.NEW_PEER_RESPONSE, id);
     };
-    SocketApp.MAX_ASSIGN_ID = 64;
+    SocketApp.MAX_ASSIGN_ID = 50;
     SocketApp.PING_INTERVAL = 30000;
     return SocketApp;
 })();

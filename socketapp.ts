@@ -8,7 +8,7 @@ import BiMap = require("bimap");
 import events = require("./events");
 
 class SocketApp {
-    static MAX_ASSIGN_ID = 64;
+    static MAX_ASSIGN_ID = 50;
     static PING_INTERVAL = 30000;
 
 
@@ -59,7 +59,7 @@ class SocketApp {
                 console.log("Client id " + id + " logged in");
                 if (id < SocketApp.MAX_ASSIGN_ID) {
                     var message = "Client tried to log in with id " + id + " which is below the allowed value!";
-                    console.warn();
+                    console.warn(message);
                     socket.emit(events.CLIENT_ERROR_RESPONSE, message);
                 }
                 peerId = id;
