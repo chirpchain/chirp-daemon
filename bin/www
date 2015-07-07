@@ -7,7 +7,13 @@
 var app = require('../app');
 var debug = require('debug')('chirp-daemon:server');
 var http = require('http');
+var fs = require('fs');
+var path = require('path');
 var SocketApp = require('../socketapp');
+
+var configFile = process.argv[2] || process.env.CHIRP_CONFIG_FILE;
+var config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+console.log("Read configuration file: " + path.resolve(configFile));
 
 /**
  * Get port from environment and store in Express.
@@ -34,7 +40,7 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-var socketApp = new SocketApp(io);
+var socketApp = new SocketApp(io, config);
 
 
 

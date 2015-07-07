@@ -23,4 +23,11 @@ module messages {
         recipient : string;
         message : string;
     }
+    export interface ChirpNodeInfo {
+        id : number;
+        name : string;
+        acoustic : boolean;
+        forwardAcousticNodeId : number;
+        backwardAcousticNodeId : number;
+    }
  }
