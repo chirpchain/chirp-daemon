@@ -12,8 +12,13 @@ var path = require('path');
 var SocketApp = require('../socketapp');
 
 var configFile = process.argv[2] || process.env.CHIRP_CONFIG_FILE;
+configFile = path.resolve(configFile);
+console.log("Config file is " + configFile);
+if (! fs.existsSync(configFile)) {
+    console.log("Couldn't find config file at that path!!");
+}
 var config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-console.log("Read configuration file: " + path.resolve(configFile));
+console.log("Read configuration file");
 
 /**
  * Get port from environment and store in Express.
