@@ -3,9 +3,10 @@
 var BiMap = require("bimap");
 var events = require("./events");
 var SocketApp = (function () {
-    function SocketApp(io) {
+    function SocketApp(io, config) {
         var _this = this;
         this.io = io;
+        this.config = config;
         this.map = new BiMap();
         this.lastId = 0;
         io.on("connection", function (socket) {
@@ -100,6 +101,7 @@ var SocketApp = (function () {
         console.log("Assigning an client id of " + id);
         this.map.push(id, socket.id);
         socket.emit(events.ASSIGN_ID_RESPONSE, id);
+        socket.emit(events.SET_NODE_INFO, this.config.nodes[id]);
         socket.broadcast.emit(events.NEW_PEER_RESPONSE, id);
     };
     SocketApp.MAX_ASSIGN_ID = 50;

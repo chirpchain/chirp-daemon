@@ -30,4 +30,10 @@ module messages {
         forwardAcousticNodeId : number;
         backwardAcousticNodeId : number;
     }
+    export interface Config {
+        port : number;
+        nodes : {
+            [nodeid : number] : ChirpNodeInfo
+        }
+    }
  }
