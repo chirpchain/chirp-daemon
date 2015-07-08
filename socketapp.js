@@ -102,6 +102,7 @@ var SocketApp = (function () {
         this.map.push(id, socket.id);
         socket.emit(events.ASSIGN_ID_RESPONSE, id);
         socket.emit(events.SET_NODE_INFO, this.config.nodes[id]);
+        socket.emit(events.RECEIVE_PEER_NODE_INFOS_EVENT, this.config.nodes);
         socket.broadcast.emit(events.NEW_PEER_RESPONSE, id);
     };
     SocketApp.MAX_ASSIGN_ID = 50;

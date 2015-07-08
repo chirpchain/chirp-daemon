@@ -4,12 +4,14 @@
     "60": {
       "id": 60,
       "name": "Test Node 1",
-      "acoustic": false
+      "acoustic": true,
+      "forwardAcousticNodeId" : 61
     },
     "61": {
       "id": 61,
       "name": "Test Node 2",
-      "acoustic": false
+      "acoustic": true,
+      "backwardAcousticNodeId" : 60
     }
   }
 }
