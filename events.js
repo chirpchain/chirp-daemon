@@ -10,7 +10,8 @@ var events = {
     RECEIVE_PEER_NODE_INFOS_EVENT: "peerNodeInfos",
     CLIENT_ERROR_RESPONSE: "clientError",
     NEW_PEER_RESPONSE: "newPeer",
-    PEER_DISCONNECTED_RESPONSE: "peerDisconnected"
+    PEER_DISCONNECTED_RESPONSE: "peerDisconnected",
+    CLIENT_PING: "clientPing"
 };
 module.exports = events;
 //# sourceMappingURL=events.js.map

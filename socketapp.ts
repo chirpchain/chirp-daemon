@@ -39,6 +39,7 @@ class SocketApp {
                     this.clientGone(peerId);
                 }
             });
+            socket.on(events.CLIENT_PING, (ack : Function) => ack());
             socket.on(events.AUDIO_DATA, (msg : messages.AudioMessage) => {
                 this.route(events.AUDIO_DATA, msg);
             });

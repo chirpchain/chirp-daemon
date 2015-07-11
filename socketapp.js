@@ -33,6 +33,7 @@ var SocketApp = (function () {
                     _this.clientGone(peerId);
                 }
             });
+            socket.on(events.CLIENT_PING, function (ack) { return ack(); });
             socket.on(events.AUDIO_DATA, function (msg) {
                 _this.route(events.AUDIO_DATA, msg);
             });
